@@ -1,26 +1,162 @@
-@import "tailwindcss";
+/* globals.css */
 
+@import "tailwindcss"; /* Keep this to import all of Tailwind's utility classes */
+
+/* Define CSS Variables for the theme */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light theme primary colors */
+  --color-light-bg: #FFFFFF; /* White for main background */
+  --color-light-card-bg: #F9FAFB; /* Off-white/light gray for cards and calendar main bg */
+  --color-light-text-secondary: #6B7280; /* Gray-500 for secondary text (e.g., inactive days) */
+  --color-light-text-main: #1F2937; /* Gray-900 for main text */
+  --color-light-accent-blue: #3B82F6; /* Blue-500 for accents (buttons, active events) */
+  --color-light-accent-blue-dark: #2563EB; /* Blue-600 for hover/active */
+  --color-light-border: #E5E7EB; /* Gray-200 border color */
+
+  /* Specific colors for card icons (emojis in this case) */
+  --color-icon-blue-bg: #DBEAFE; /* Light blue background for phone icon card (blue-100) */
+  --color-icon-blue-text: #2563EB; /* Darker blue for phone icon text (blue-600) */
+  --color-icon-green-bg: #D1FAE5; /* Light green background for calendar icon card (green-100) */
+  --color-icon-green-text: #059669; /* Darker green for calendar icon text (green-600) */
+
+  /* Calendar specific colors - ENSURE THESE ARE LIGHT-THEMED */
+  --rbc-bg-default: var(--color-light-card-bg); /* Main calendar background */
+  --rbc-text-default: var(--color-light-text-main); /* Default text color in calendar */
+  --rbc-border-color: var(--color-light-border); /* All internal borders */
+  --rbc-today-bg: #E0F2F7; /* A light, soft blue for "today" cell background */
+  --rbc-off-range-bg: #ffffff; /* Light gray background for days outside current month */
+  --rbc-selected-bg: var(--color-light-accent-blue); /* Background when a day is selected */
+  --rbc-event-bg: var(--color-light-accent-blue); /* Event background color */
+  --rbc-event-text: #FFFFFF; /* Event text color (white on blue) */
+  --rbc-button-bg: #F3F4F6; /* Toolbar button background (gray-100) */
+  --rbc-button-hover-bg: #E5E7EB; /* Toolbar button hover background (gray-200) */
+  --rbc-button-active-bg: var(--color-light-accent-blue); /* Active toolbar button background */
+  --rbc-button-text: var(--color-light-text-main); /* Toolbar button text */
+  --rbc-inactive-day-text: #9CA3AF; /* Light gray for day numbers outside current month (gray-400) */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-light-bg);
+  color: var(--color-light-text-main);
+  font-family: Arial, Helvetica, sans-serif; /* Or a system font stack */
 }
+
+/* Custom styles for react-big-calendar */
+.rbc-calendar {
+  font-family: Arial, Helvetica, sans-serif; /* Keep consistent font */
+  background-color: var(--rbc-bg-default); /* Main calendar background */
+  color: var(--rbc-text-default);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Calendar header (Sun, Mon, Tue...) */
+.rbc-header {
+  color: var(--rbc-text-default);
+  font-weight: 500;
+  border-bottom: 1px solid var(--rbc-border-color);
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+/* Individual cells in month view borders */
+.rbc-month-view .rbc-day-bg {
+  border-left: 1px solid var(--rbc-border-color);
+  border-bottom: 1px solid var(--rbc-border-color);
+}
+.rbc-month-view .rbc-row-content {
+  border-left: 1px solid var(--rbc-border-color);
+}
+.rbc-month-view .rbc-header + .rbc-header {
+    border-left: 1px solid var(--rbc-border-color);
+}
+
+
+/* Styling for days that are outside the current month (greyed out) */
+.rbc-off-range-bg {
+  background-color: var(--rbc-off-range-bg);
+}
+.rbc-off-range span {
+    color: var(--rbc-inactive-day-text);
+}
+
+
+/* Today's cell background */
+.rbc-day-bg.rbc-today {
+  background-color: var(--rbc-today-bg);
+}
+
+/* Selected cell background (if a day is clicked) */
+.rbc-day-bg.rbc-selected {
+  background-color: var(--rbc-selected-bg);
+}
+
+/* Event container for "Appointment with..." */
+.rbc-event {
+  background-color: var(--rbc-event-bg);
+  color: var(--rbc-event-text);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.875rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  opacity: 0.9;
+}
+
+.rbc-event-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Toolbar buttons (Today, Back, Next, Month, Week, Day, Agenda) */
+.rbc-toolbar button {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 200ms ease-in-out;
+  border: none;
+  cursor: pointer;
+  background-color: var(--rbc-button-bg);
+  color: var(--rbc-button-text);
+}
+
+.rbc-toolbar button:hover {
+  background-color: var(--rbc-button-hover-bg);
+}
+
+/* Active toolbar button (e.g., 'Month' when selected) */
+.rbc-toolbar button.rbc-active {
+  background-color: var(--rbc-button-active-bg);
+}
+
+/* Other calendar elements for light theme consistency */
+.rbc-agenda-view table {
+  background-color: var(--rbc-bg-default);
+  color: var(--rbc-text-default);
+  border: 1px solid var(--rbc-border-color);
+}
+.rbc-agenda-view th {
+  border-bottom: 1px solid var(--rbc-border-color);
+}
+.rbc-agenda-view td {
+  border-bottom: 1px solid var(--rbc-border-color);
+}
+.rbc-time-slot {
+  border-top: 1px solid var(--rbc-border-color);
+}
+.rbc-time-header {
+  border-bottom: 1px solid var(--rbc-border-color);
+}
+.rbc-time-header-content {
+  border-left: 1px solid var(--rbc-border-color);
+}
+.rbc-date-cell {
+    color: var(--rbc-text-default);
+}
+.rbc-current-time-indicator {
+    background-color: var(--color-light-accent-blue);
+}
+

@@ -1,103 +1,144 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useState, useCallback } from 'react'; // Import useCallback
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css'; // Essential for basic calendar structure
+import Link from 'next/link';
+
+const localizer = momentLocalizer(moment);
+
+export default function Dashboard() {
+  const [stats, setStats] = useState({ calls: 0, appointments: 0 });
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // *** NEW STATE VARIABLES FOR CALENDAR CONTROL ***
+  const [currentDate, setCurrentDate] = useState(new Date()); // Represents the date the calendar is currently showing
+  const [currentView, setCurrentView] = useState('month'); // Represents the current view (month, week, day, agenda)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const metricsRes = await fetch('/api/dashboard/metrics');
+        if (!metricsRes.ok) {
+          throw new Error(`HTTP error! status: ${metricsRes.status}`);
+        }
+        const metricsData = await metricsRes.json();
+        setStats(metricsData);
+
+        const calendarRes = await fetch('/api/dashboard/calendar');
+        if (!calendarRes.ok) {
+          throw new Error(`HTTP error! status: ${calendarRes.status}`);
+        }
+        const calendarData = await calendarRes.json();
+        setEvents(calendarData.map(event => ({
+          title: event.summary || event.title,
+          start: new Date(event.start),
+          end: new Date(event.end),
+        })));
+      } catch (e) {
+        console.error("Failed to fetch dashboard data:", e);
+        setError("Failed to load dashboard data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // *** NEW CALLBACK FUNCTIONS FOR CALENDAR INTERACTION ***
+  const handleNavigate = useCallback((newDate) => setCurrentDate(newDate), []);
+  const handleView = useCallback((newView) => setCurrentView(newView), []);
+
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white text-gray-900">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white text-red-600">
+        Error: {error}
+      </div>
+    );
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    // Main container uses a white background color and dark text
+    <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8 text-gray-900">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        {/* Header and Chatbot Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">Clinic Dashboard</h1>
+          <Link href="/ai" passHref>
+            <button className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105 duration-200 ease-in-out text-base sm:text-lg">
+              💬
+              <span>AI Appointment Assistant</span>
+            </button>
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {/* Total Agent Calls Card */}
+          <div className="bg-blue-100 p-5 sm:p-6 rounded-xl shadow-md-plus border border-blue-200 flex items-center gap-4">
+            <div className="flex-shrink-0 p-3 bg-blue-200 rounded-full text-blue-600 text-3xl">
+              📞 {/* Phone emoji */}
+            </div>
+            <div>
+              <p className="text-sm sm:text-base text-gray-700 font-medium mb-1">Total Agent Calls</p>
+              <p className="text-4xl sm:text-5xl font-bold text-gray-900">{stats.calls}</p>
+            </div>
+          </div>
+
+          {/* Total Appointments Booked Card */}
+          <div className="bg-green-100 p-5 sm:p-6 rounded-xl shadow-md-plus border border-green-200 flex items-center gap-4">
+            <div className="flex-shrink-0 p-3 bg-green-200 rounded-full text-green-600 text-3xl">
+              🗓️ {/* Calendar emoji */}
+            </div>
+            <div>
+              <p className="text-sm sm:text-base text-gray-700 font-medium mb-1">Total Appointments Booked</p>
+              <p className="text-4xl sm:text-5xl font-bold text-gray-900">{stats.appointments}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Doctor Calendar */}
+        <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-md-plus border border-gray-200">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900">Doctor Appointments</h2>
+          <div className="h-[600px] sm:h-[700px] lg:h-[800px]">
+            <Calendar
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: '100%',}}
+              // *** ADDED PROPS FOR CALENDAR CONTROL ***
+              date={currentDate}       // Pass the current date state to the calendar
+              view={currentView}       // Pass the current view state to the calendar
+              onNavigate={handleNavigate} // Function to call when navigation buttons (Today, Back, Next) are clicked
+              onView={handleView}         // Function to call when view buttons (Month, Week, Day, Agenda) are clicked
+              eventPropGetter={() => ({
+                style: {
+                  backgroundColor: '#3B82F6', // Tailwind's blue-500
+                  color: 'white',
+                  borderRadius: '4px',
+                  padding: '2px 6px',
+                  border: 'none',
+                  fontSize: '0.875rem',
+                }
+              })}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
