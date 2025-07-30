@@ -64,12 +64,12 @@ Create a `.env.local` file:
 
 ```
 OPENAI_API_KEY=your_openai_key
+GOOGLE_CLIENT_EMAIL=your_service_email
+GOOGLE_PRIVATE_KEY=your_google_private_key
 ```
 
 ### 4. Google Calendar Setup
 
-- get your service-account.json from google apis
-- Add remane to `service-account.json` and add in `src/config/`
 - go to google calender in settings add the share with in that add the client email from the `service-account.json` with permission to make changes to events.
 
 
