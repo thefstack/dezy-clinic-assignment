@@ -10,10 +10,11 @@
 !.yarn/releases
 !.yarn/versions
 
+/src/config
+
 # testing
 /coverage
 
-/src/config
 
 # next.js
 /.next/

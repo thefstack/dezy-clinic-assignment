@@ -68,8 +68,10 @@ OPENAI_API_KEY=your_openai_key
 
 ### 4. Google Calendar Setup
 
-- Add `service-account.json` in `src/config/`
-- Share doctor calendars with the service account email
+- get your service-account.json from google apis
+- Add remane to `service-account.json` and add in `src/config/`
+- go to google calender in settings add the share with in that add the client email from the `service-account.json` with permission to make changes to events.
+
 
 ### 5. Run the app
 
