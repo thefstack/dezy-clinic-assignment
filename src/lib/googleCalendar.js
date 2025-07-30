@@ -1,8 +1,12 @@
 import { google } from "googleapis";
 import { JWT } from "google-auth-library";
-import credentials from "@/config/service-account.json"; // Secure path
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+const credentials = {
+      client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+}
+
+const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 
 const auth = new JWT({
   email: credentials.client_email,
